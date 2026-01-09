@@ -36,7 +36,6 @@ const server = serve({
 
     "/api/upload": {
       async POST(req) {
-        if (!isAuthorized(req)) return unauthorized();
         if (!isStorageConfigured()) {
           return Response.json(
             { error: "Storage not configured" },
@@ -57,6 +56,15 @@ const server = serve({
         if (invalidFiles.length > 0) {
           return Response.json(
             { error: "Only markdown files are allowed" },
+            { status: 400 }
+          );
+        }
+
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        const oversizedFiles = files.filter((f) => f.size > maxSize);
+        if (oversizedFiles.length > 0) {
+          return Response.json(
+            { error: "Files must be less than 5MB each" },
             { status: 400 }
           );
         }
