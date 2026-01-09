@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CCollectionIdIndexRouteImport } from './routes/c.$collectionId.index'
+import { Route as CCollectionIdSplatRouteImport } from './routes/c.$collectionId.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CCollectionIdIndexRoute = CCollectionIdIndexRouteImport.update({
+  id: '/c/$collectionId/',
+  path: '/c/$collectionId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CCollectionIdSplatRoute = CCollectionIdSplatRouteImport.update({
+  id: '/c/$collectionId/$',
+  path: '/c/$collectionId/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/c/$collectionId/$': typeof CCollectionIdSplatRoute
+  '/c/$collectionId': typeof CCollectionIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/c/$collectionId/$': typeof CCollectionIdSplatRoute
+  '/c/$collectionId': typeof CCollectionIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/c/$collectionId/$': typeof CCollectionIdSplatRoute
+  '/c/$collectionId/': typeof CCollectionIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/c/$collectionId/$' | '/c/$collectionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/c/$collectionId/$' | '/c/$collectionId'
+  id: '__root__' | '/' | '/c/$collectionId/$' | '/c/$collectionId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CCollectionIdSplatRoute: typeof CCollectionIdSplatRoute
+  CCollectionIdIndexRoute: typeof CCollectionIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/c/$collectionId/': {
+      id: '/c/$collectionId/'
+      path: '/c/$collectionId'
+      fullPath: '/c/$collectionId'
+      preLoaderRoute: typeof CCollectionIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$collectionId/$': {
+      id: '/c/$collectionId/$'
+      path: '/c/$collectionId/$'
+      fullPath: '/c/$collectionId/$'
+      preLoaderRoute: typeof CCollectionIdSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CCollectionIdSplatRoute: CCollectionIdSplatRoute,
+  CCollectionIdIndexRoute: CCollectionIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

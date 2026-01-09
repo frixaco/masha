@@ -7,9 +7,15 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
+  optimizeDeps: {
+    exclude: ['bun'],
+  },
+  ssr: {
+    external: ['bun'],
+  },
   plugins: [
     devtools(),
-    nitro(),
+    nitro({ preset: 'bun' }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
