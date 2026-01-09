@@ -13,7 +13,9 @@ function getStoredTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getStoredTheme)
+  // Keep the initial render deterministic between SSR and client hydration.
+  // Then, after mount, sync from localStorage.
+  const [theme, setThemeState] = useState<Theme>('system')
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme)
@@ -25,6 +27,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         window.matchMedia('(prefers-color-scheme: dark)').matches)
     document.documentElement.classList.toggle('dark', isDark)
   }
+
+  useEffect(() => {
+    setTheme(getStoredTheme())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Listen for system preference changes when in "system" mode
   useEffect(() => {

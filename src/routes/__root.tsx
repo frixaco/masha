@@ -1,6 +1,7 @@
 import {
   HeadContent,
   Link,
+  Outlet,
   Scripts,
   createRootRoute,
 } from '@tanstack/react-router'
@@ -37,6 +38,7 @@ export const Route = createRootRoute({
     ],
   }),
 
+  component: RootComponent,
   shellComponent: RootDocument,
   notFoundComponent: () => (
     <div className="flex flex-col items-center justify-center gap-2 bg-background">
@@ -51,9 +53,28 @@ export const Route = createRootRoute({
   ),
 })
 
+function RootComponent() {
+  return (
+    <>
+      <Outlet />
+      <TanStackDevtools
+        config={{
+          position: 'top-left',
+        }}
+        plugins={[
+          {
+            name: 'Tanstack Router',
+            render: <TanStackRouterDevtoolsPanel />,
+          },
+        ]}
+      />
+    </>
+  )
+}
+
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html suppressHydrationWarning>
       <head>
         <HeadContent />
         <script
@@ -63,17 +84,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body>
-        <TanStackDevtools
-          config={{
-            position: 'top-left',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
         <ThemeProvider>{children}</ThemeProvider>
         <Scripts />
       </body>
