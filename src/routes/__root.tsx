@@ -1,17 +1,14 @@
-import { HeadContent, Link, Scripts, createRootRoute } from '@tanstack/react-router'
-import { ThemeProvider } from '@/lib/theme'
-import { lazy, Suspense } from 'react'
+import {
+  HeadContent,
+  Link,
+  Scripts,
+  createRootRoute,
+} from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
-
-const TanStackRouterDevtools =
-  process.env.NODE_ENV === 'production'
-    ? () => null
-    : lazy(() =>
-        import('@tanstack/react-router-devtools').then((mod) => ({
-          default: mod.TanStackRouterDevtools,
-        }))
-      )
+import { ThemeProvider } from '@/lib/theme'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -42,9 +39,12 @@ export const Route = createRootRoute({
 
   shellComponent: RootDocument,
   notFoundComponent: () => (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-2 bg-background">
+    <div className="flex flex-col items-center justify-center gap-2 bg-background">
       <div className="text-sm text-muted-foreground">Not found</div>
-      <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+      <Link
+        to="/"
+        className="text-sm text-muted-foreground hover:text-foreground"
+      >
         ← Back
       </Link>
     </div>
@@ -53,7 +53,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html>
       <head>
         <HeadContent />
         <script
@@ -63,12 +63,18 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
-        <Suspense>
-          <TanStackRouterDevtools position="bottom-right" />
-        </Suspense>
+        <TanStackDevtools
+          config={{
+            position: 'top-left',
+          }}
+          plugins={[
+            {
+              name: 'Tanstack Router',
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+          ]}
+        />
+        <ThemeProvider>{children}</ThemeProvider>
         <Scripts />
       </body>
     </html>

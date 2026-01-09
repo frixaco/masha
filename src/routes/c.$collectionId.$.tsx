@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Copy, Sun, Moon, Home } from "lucide-react";
-import parse from "html-react-parser";
-import { Button } from "@/components/ui/button";
-import { getFileContentFn } from "@/server/functions";
-import { useTheme } from "@/lib/theme";
+import { useState } from 'react'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { Copy, Home, Moon, Sun } from 'lucide-react'
+import parse from 'html-react-parser'
+import { Button } from '@/components/ui/button'
+import { getFileContentFn } from '@/server/functions'
+import { useTheme } from '@/lib/theme'
 
-export const Route = createFileRoute("/c/$collectionId/$")({
+export const Route = createFileRoute('/c/$collectionId/$')({
   loader: async ({ params }) => {
-    const fileName = decodeURIComponent(params._splat || "");
+    const fileName = decodeURIComponent(params._splat || '')
     if (!fileName) {
-      throw new Error("File not found");
+      throw new Error('File not found')
     }
 
     const result = await getFileContentFn({
@@ -18,42 +18,45 @@ export const Route = createFileRoute("/c/$collectionId/$")({
         collectionId: params.collectionId,
         fileName,
       },
-    });
+    })
 
     if (!result) {
-      throw new Error("File not found");
+      throw new Error('File not found')
     }
 
-    return result;
+    return result
   },
   component: FileViewPage,
   errorComponent: FileError,
-});
+})
 
 function FileError() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-2 bg-background">
+    <div className="flex flex-col items-center justify-center gap-2 bg-background">
       <div className="text-sm text-destructive">File not found</div>
-      <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+      <Link
+        to="/"
+        className="text-sm text-muted-foreground hover:text-foreground"
+      >
         ← Back
       </Link>
     </div>
-  );
+  )
 }
 
 function FileViewPage() {
-  const { id: collectionId, fileName, html } = Route.useLoaderData();
-  const { theme, setTheme } = useTheme();
-  const [copied, setCopied] = useState(false);
+  const { id: collectionId, fileName, html } = Route.useLoaderData()
+  const { theme, setTheme } = useTheme()
+  const [copied, setCopied] = useState(false)
 
   const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    navigator.clipboard.writeText(window.location.href)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-background">
+    <div className="flex flex-col items-center bg-background">
       <header className="w-full max-w-xl flex items-center justify-between border-b border-border px-4 py-4">
         <div className="flex items-center gap-2">
           <Link to="/">
@@ -71,14 +74,14 @@ function FileViewPage() {
         </div>
         <div className="flex gap-1">
           <Button variant="ghost" size="sm" onClick={copyLink}>
-            <Copy /> {copied ? "Copied" : "Copy"}
+            <Copy /> {copied ? 'Copied' : 'Copy'}
           </Button>
           <Button
             variant="ghost"
             size="icon-sm"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           >
-            {theme === "dark" ? <Sun /> : <Moon />}
+            {theme === 'dark' ? <Sun /> : <Moon />}
           </Button>
         </div>
       </header>
@@ -90,5 +93,5 @@ function FileViewPage() {
         </article>
       </main>
     </div>
-  );
+  )
 }

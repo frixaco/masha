@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'react'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { Copy, Sun, Moon, Home } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
+import { Copy, Home, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { getCollectionFn, addFilesToCollectionFn } from '@/server/functions'
+import { addFilesToCollectionFn, getCollectionFn } from '@/server/functions'
 import { useTheme } from '@/lib/theme'
 
 export const Route = createFileRoute('/c/$collectionId/')({
@@ -19,7 +19,7 @@ export const Route = createFileRoute('/c/$collectionId/')({
 
 function CollectionError() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-2 bg-background">
+    <div className="flex flex-col items-center justify-center gap-2 bg-background">
       <div className="text-sm text-destructive">Collection not found</div>
       <Link
         to="/"
@@ -36,7 +36,7 @@ function CollectionPage() {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [copied, setCopied] = useState(false)
-  const [pendingFiles, setPendingFiles] = useState<File[]>([])
+  const [pendingFiles, setPendingFiles] = useState<Array<File>>([])
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
@@ -50,7 +50,7 @@ function CollectionPage() {
   const handleFiles = useCallback((newFiles: FileList | null) => {
     if (!newFiles) return
     const mdFiles = Array.from(newFiles).filter(
-      (f) => f.name.endsWith('.md') || f.name.endsWith('.markdown')
+      (f) => f.name.endsWith('.md') || f.name.endsWith('.markdown'),
     )
     setPendingFiles((prev) => [...prev, ...mdFiles])
     setError(null)
@@ -71,7 +71,7 @@ function CollectionPage() {
         pendingFiles.map(async (f) => ({
           name: f.name,
           content: await f.text(),
-        }))
+        })),
       )
 
       await addFilesToCollectionFn({
@@ -88,7 +88,7 @@ function CollectionPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-background">
+    <div className="flex flex-col items-center bg-background">
       <header className="w-full max-w-xl flex items-center justify-between border-b border-border px-4 py-4">
         <div className="flex items-center gap-2">
           <Link to="/">

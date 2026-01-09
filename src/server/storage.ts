@@ -36,7 +36,7 @@ export async function uploadFile(
 
 export async function listCollectionFiles(
   collectionId: string,
-): Promise<string[]> {
+): Promise<Array<string>> {
   const client = getClient()
   if (!client) throw new Error('Storage not configured')
 
@@ -46,7 +46,7 @@ export async function listCollectionFiles(
   if (!result.contents) return []
 
   return result.contents
-    .map((obj) => obj.key?.replace(prefix, '') || '')
+    .map((obj) => obj.key.replace(prefix, '') || '')
     .filter((name) => name.length > 0)
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
 }
@@ -70,25 +70,26 @@ export async function getFileContent(
   }
 }
 
-export async function listAllCollections(): Promise<Record<string, string[]>> {
+export async function listAllCollections(): Promise<
+  Record<string, Array<string>>
+> {
   const client = getClient()
   if (!client) throw new Error('Storage not configured')
 
   const result = await client.list({})
   if (!result.contents) return {}
 
-  const collections: Record<string, string[]> = {}
+  const collections: Record<string, Array<string>> = {}
 
   for (const obj of result.contents) {
     if (!obj.key) continue
     const [collectionId, ...rest] = obj.key.split('/')
     const fileName = rest.join('/')
-    if (!collectionId || !fileName) continue
+    if (!collectionId || !fileName)
+      continue
 
-    if (!collections[collectionId]) {
-      collections[collectionId] = []
-    }
-    collections[collectionId].push(fileName)
+      // wtf is this syntax
+    ;(collections[collectionId] ??= []).push(fileName)
   }
 
   for (const id of Object.keys(collections)) {

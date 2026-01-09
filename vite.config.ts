@@ -2,22 +2,21 @@ import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
-import viteTsConfigPaths from 'vite-tsconfig-paths'
+import tsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
-  optimizeDeps: {
-    exclude: ['bun'],
-  },
-  ssr: {
-    external: ['bun'],
-  },
   plugins: [
-    devtools(),
+    devtools({
+      eventBusConfig: {
+        debug: true,
+      },
+      logging: true,
+    }),
     nitro({ preset: 'bun' }),
     // this is the plugin that enables path aliases
-    viteTsConfigPaths({
+    tsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
     tailwindcss(),

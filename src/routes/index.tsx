@@ -1,75 +1,75 @@
-import { useState, useCallback } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Sun, Moon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { uploadFilesFn } from "@/server/functions";
-import { useTheme } from "@/lib/theme";
+import { useCallback, useState } from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { Moon, Sun } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { uploadFilesFn } from '@/server/functions'
+import { useTheme } from '@/lib/theme'
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute('/')({
   component: UploadPage,
-});
+})
 
 function UploadPage() {
-  const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
-  const [files, setFiles] = useState<File[]>([]);
-  const [name, setName] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [dragOver, setDragOver] = useState(false);
+  const navigate = useNavigate()
+  const { theme, setTheme } = useTheme()
+  const [files, setFiles] = useState<Array<File>>([])
+  const [name, setName] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [dragOver, setDragOver] = useState(false)
 
   const handleFiles = useCallback((newFiles: FileList | null) => {
-    if (!newFiles) return;
+    if (!newFiles) return
     const mdFiles = Array.from(newFiles).filter(
-      (f) => f.name.endsWith(".md") || f.name.endsWith(".markdown")
-    );
-    setFiles((prev) => [...prev, ...mdFiles]);
-    setError(null);
-  }, []);
+      (f) => f.name.endsWith('.md') || f.name.endsWith('.markdown'),
+    )
+    setFiles((prev) => [...prev, ...mdFiles])
+    setError(null)
+  }, [])
 
   const removeFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
-  };
+    setFiles((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const handleUpload = async () => {
-    if (files.length === 0) return;
+    if (files.length === 0) return
 
-    setUploading(true);
-    setError(null);
+    setUploading(true)
+    setError(null)
 
     try {
       const fileData = await Promise.all(
         files.map(async (f) => ({
           name: f.name,
           content: await f.text(),
-        }))
-      );
+        })),
+      )
 
       const result = await uploadFilesFn({
         data: {
           files: fileData,
           name: name.trim() || undefined,
         },
-      });
+      })
 
-      navigate({ to: "/c/$collectionId", params: { collectionId: result.id } });
+      navigate({ to: '/c/$collectionId', params: { collectionId: result.id } })
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
-      setUploading(false);
+      setError(err instanceof Error ? err.message : 'Upload failed')
+      setUploading(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-background">
+    <div className="flex flex-col items-center bg-background">
       <header className="w-full max-w-xl flex items-center justify-between border-b border-border px-4 py-4">
         <h1 className="text-sm font-medium text-foreground">masha</h1>
         <Button
           variant="ghost"
           size="icon-sm"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
-          {theme === "dark" ? <Sun /> : <Moon />}
+          {theme === 'dark' ? <Sun /> : <Moon />}
         </Button>
       </header>
 
@@ -77,17 +77,17 @@ function UploadPage() {
         <label
           htmlFor="file-input"
           className={`block border border-dashed p-6 text-center transition-colors cursor-pointer text-muted-foreground hover:text-foreground text-sm ${
-            dragOver ? "border-foreground" : "border-border"
+            dragOver ? 'border-foreground' : 'border-border'
           }`}
           onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
+            e.preventDefault()
+            setDragOver(true)
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={(e) => {
-            e.preventDefault();
-            setDragOver(false);
-            handleFiles(e.dataTransfer.files);
+            e.preventDefault()
+            setDragOver(false)
+            handleFiles(e.dataTransfer.files)
           }}
         >
           <input
@@ -112,7 +112,7 @@ function UploadPage() {
                 className="text-sm"
               />
               <Button onClick={handleUpload} disabled={uploading}>
-                {uploading ? "..." : "Upload"}
+                {uploading ? '...' : 'Upload'}
               </Button>
             </div>
 
@@ -142,5 +142,5 @@ function UploadPage() {
         )}
       </main>
     </div>
-  );
+  )
 }
