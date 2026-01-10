@@ -175,13 +175,8 @@ function CollectionPage() {
             <li key={file}>
               <Link
                 to="/c/$collectionId/$"
-                params={{ collectionId }}
-                search={{}}
+                params={{ collectionId, _splat: file }}
                 className="flex items-center justify-between px-3 py-2 hover:bg-muted/50"
-                onClick={(e) => {
-                  e.preventDefault()
-                  window.location.href = `/c/${collectionId}/${encodeURIComponent(file)}`
-                }}
               >
                 <span className="text-foreground">{file}</span>
                 <span className="text-muted-foreground">→</span>

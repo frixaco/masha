@@ -47,6 +47,7 @@ function getSystemPrefersDarkServer(): boolean {
 function applyThemeToDocument(theme: Theme, systemPrefersDark: boolean) {
   const isDark = theme === 'dark' || (theme === 'system' && systemPrefersDark)
   document.documentElement.classList.toggle('dark', isDark)
+  document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
