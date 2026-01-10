@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useSyncExternalStore } from 'react'
 
 type Theme = 'light' | 'dark' | 'system'
 
@@ -7,44 +7,69 @@ const ThemeContext = createContext<{
   setTheme: (theme: Theme) => void
 } | null>(null)
 
-function getStoredTheme(): Theme {
-  if (typeof window === 'undefined') return 'system'
+let listeners: Array<() => void> = []
+
+function emitChange() {
+  for (const listener of listeners) {
+    listener()
+  }
+}
+
+function subscribeToTheme(listener: () => void) {
+  listeners = [...listeners, listener]
+  return () => {
+    listeners = listeners.filter((l) => l !== listener)
+  }
+}
+
+function getThemeSnapshot(): Theme {
   return (localStorage.getItem('theme') || 'system') as Theme
 }
 
+function getThemeServerSnapshot(): Theme {
+  return 'system'
+}
+
+function subscribeToSystemPreference(listener: () => void) {
+  const mq = window.matchMedia('(prefers-color-scheme: dark)')
+  mq.addEventListener('change', listener)
+  return () => mq.removeEventListener('change', listener)
+}
+
+function getSystemPrefersDark(): boolean {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+}
+
+function getSystemPrefersDarkServer(): boolean {
+  return false
+}
+
+function applyThemeToDocument(theme: Theme, systemPrefersDark: boolean) {
+  const isDark = theme === 'dark' || (theme === 'system' && systemPrefersDark)
+  document.documentElement.classList.toggle('dark', isDark)
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Keep the initial render deterministic between SSR and client hydration.
-  // Then, after mount, sync from localStorage.
-  const [theme, setThemeState] = useState<Theme>('system')
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    getThemeSnapshot,
+    getThemeServerSnapshot
+  )
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme)
-    localStorage.setItem('theme', newTheme)
+  const systemPrefersDark = useSyncExternalStore(
+    subscribeToSystemPreference,
+    getSystemPrefersDark,
+    getSystemPrefersDarkServer
+  )
 
-    const isDark =
-      newTheme === 'dark' ||
-      (newTheme === 'system' &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches)
-    document.documentElement.classList.toggle('dark', isDark)
+  if (typeof window !== 'undefined') {
+    applyThemeToDocument(theme, systemPrefersDark)
   }
 
-  useEffect(() => {
-    setTheme(getStoredTheme())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Listen for system preference changes when in "system" mode
-  useEffect(() => {
-    if (theme !== 'system') return
-
-    const mq = window.matchMedia('(prefers-color-scheme: dark)')
-    const handler = (e: MediaQueryListEvent) => {
-      document.documentElement.classList.toggle('dark', e.matches)
-    }
-
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [theme])
+  const setTheme = (newTheme: Theme) => {
+    localStorage.setItem('theme', newTheme)
+    emitChange()
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
