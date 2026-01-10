@@ -59,7 +59,7 @@ function RootComponent() {
       <Outlet />
       <TanStackDevtools
         config={{
-          position: 'top-left',
+          position: 'bottom-right',
         }}
         plugins={[
           {

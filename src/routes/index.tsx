@@ -63,7 +63,7 @@ function UploadPage() {
   return (
     <div className="flex flex-col items-center bg-background">
       <header className="w-full max-w-xl flex items-center justify-between border-b border-border px-4 py-4">
-        <h1 className="text-sm font-medium text-foreground">masha</h1>
+        <h1 className="text-sm font-medium text-foreground">mash</h1>
         <Button
           variant="ghost"
           size="icon-sm"
