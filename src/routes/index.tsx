@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Moon, Sun } from 'lucide-react'
+import { Github, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { uploadFilesFn } from '@/server/functions'
@@ -102,7 +102,18 @@ function UploadPage() {
       }}
     >
       <header className="w-full max-w-xl flex items-center justify-between border-b border-border px-4 py-4">
-        <h1 className="text-sm font-medium text-foreground">mash</h1>
+        <div className="flex items-center gap-2">
+          <a
+            href="https://github.com/frixaco/mash"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="ghost" size="icon-sm">
+              <Github />
+            </Button>
+          </a>
+          <h1 className="text-sm font-medium text-foreground">mash</h1>
+        </div>
         <Button
           variant="ghost"
           size="icon-sm"

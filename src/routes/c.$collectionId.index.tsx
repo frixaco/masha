@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
-import { Copy, Home, Moon, Sun } from 'lucide-react'
+import { Copy, Github, Home, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { addFilesToCollectionFn, getCollectionFn } from '@/server/functions'
 import { useTheme } from '@/lib/theme'
@@ -96,6 +96,15 @@ function CollectionPage() {
               <Home />
             </Button>
           </Link>
+          <a
+            href="https://github.com/frixaco/mash"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="ghost" size="icon-sm">
+              <Github />
+            </Button>
+          </a>
           <h1 className="text-sm font-mono text-foreground">{collectionId}</h1>
         </div>
         <div className="flex gap-1">

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Copy, Home, Moon, Sun } from 'lucide-react'
+import { Copy, Github, Home, Moon, Sun } from 'lucide-react'
 import parse from 'html-react-parser'
 import { Button } from '@/components/ui/button'
 import { getFileContentFn } from '@/server/functions'
@@ -64,6 +64,15 @@ function FileViewPage() {
               <Home />
             </Button>
           </Link>
+          <a
+            href="https://github.com/frixaco/mash"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="ghost" size="icon-sm">
+              <Github />
+            </Button>
+          </a>
           <Link
             to="/c/$collectionId"
             params={{ collectionId }}
