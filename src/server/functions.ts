@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { nanoid } from 'nanoid'
 import {
+  deleteCollection,
   getFileContent,
   isStorageConfigured,
   listCollectionFiles,
@@ -141,4 +142,20 @@ export const getFileContentFn = createServerFn({ method: 'GET' })
       fileName: data.fileName,
       html,
     }
+  })
+
+export const deleteCollectionFn = createServerFn({ method: 'POST' })
+  .inputValidator((collectionId: string) => collectionId)
+  .handler(async ({ data: collectionId }) => {
+    if (!isStorageConfigured()) {
+      throw new Error('Storage not configured')
+    }
+
+    const deleted = await deleteCollection(collectionId)
+
+    if (!deleted) {
+      throw new Error('Collection not found')
+    }
+
+    return { success: true }
   })

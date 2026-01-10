@@ -28,6 +28,27 @@ function UploadPage() {
     setError(null)
   }, [])
 
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const text = e.clipboardData.getData('text/plain')
+    if (!text.trim()) return
+
+    // Extract the first # heading for the filename
+    const headingMatch = text.match(/^#\s+(.+)$/m)
+    let fileName = 'pasted.md'
+    if (headingMatch) {
+      fileName =
+        headingMatch[1]
+          .trim()
+          .replace(/[<>:"/\\|?*]/g, '')
+          .replace(/\s+/g, '-')
+          .substring(0, 50) + '.md'
+    }
+
+    const file = new File([text], fileName, { type: 'text/markdown' })
+    setFiles((prev) => [...prev, file])
+    setError(null)
+  }, [])
+
   const removeFile = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index))
   }
@@ -61,7 +82,17 @@ function UploadPage() {
   }
 
   return (
-    <div className="flex flex-col items-center bg-background">
+    <div
+      className="flex flex-col items-center bg-background outline-none"
+      tabIndex={-1}
+      autoFocus
+      onPaste={handlePaste}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && files.length > 0 && !uploading) {
+          handleUpload()
+        }
+      }}
+    >
       <header className="w-full max-w-xl flex items-center justify-between border-b border-border px-4 py-4">
         <h1 className="text-sm font-medium text-foreground">mash</h1>
         <Button
@@ -98,7 +129,7 @@ function UploadPage() {
             accept=".md,.markdown"
             onChange={(e) => handleFiles(e.target.files)}
           />
-          Drop .md files or click to browse
+          Drop .md files, click to browse, or paste markdown
         </label>
 
         {files.length > 0 && (

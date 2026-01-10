@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DCollectionIdRouteImport } from './routes/d.$collectionId'
 import { Route as CCollectionIdIndexRouteImport } from './routes/c.$collectionId.index'
 import { Route as CCollectionIdSplatRouteImport } from './routes/c.$collectionId.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DCollectionIdRoute = DCollectionIdRouteImport.update({
+  id: '/d/$collectionId',
+  path: '/d/$collectionId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CCollectionIdIndexRoute = CCollectionIdIndexRouteImport.update({
@@ -31,30 +37,43 @@ const CCollectionIdSplatRoute = CCollectionIdSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/d/$collectionId': typeof DCollectionIdRoute
   '/c/$collectionId/$': typeof CCollectionIdSplatRoute
   '/c/$collectionId': typeof CCollectionIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/d/$collectionId': typeof DCollectionIdRoute
   '/c/$collectionId/$': typeof CCollectionIdSplatRoute
   '/c/$collectionId': typeof CCollectionIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/d/$collectionId': typeof DCollectionIdRoute
   '/c/$collectionId/$': typeof CCollectionIdSplatRoute
   '/c/$collectionId/': typeof CCollectionIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/c/$collectionId/$' | '/c/$collectionId'
+  fullPaths:
+    | '/'
+    | '/d/$collectionId'
+    | '/c/$collectionId/$'
+    | '/c/$collectionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/c/$collectionId/$' | '/c/$collectionId'
-  id: '__root__' | '/' | '/c/$collectionId/$' | '/c/$collectionId/'
+  to: '/' | '/d/$collectionId' | '/c/$collectionId/$' | '/c/$collectionId'
+  id:
+    | '__root__'
+    | '/'
+    | '/d/$collectionId'
+    | '/c/$collectionId/$'
+    | '/c/$collectionId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DCollectionIdRoute: typeof DCollectionIdRoute
   CCollectionIdSplatRoute: typeof CCollectionIdSplatRoute
   CCollectionIdIndexRoute: typeof CCollectionIdIndexRoute
 }
@@ -66,6 +85,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/d/$collectionId': {
+      id: '/d/$collectionId'
+      path: '/d/$collectionId'
+      fullPath: '/d/$collectionId'
+      preLoaderRoute: typeof DCollectionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/c/$collectionId/': {
@@ -87,6 +113,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DCollectionIdRoute: DCollectionIdRoute,
   CCollectionIdSplatRoute: CCollectionIdSplatRoute,
   CCollectionIdIndexRoute: CCollectionIdIndexRoute,
 }
