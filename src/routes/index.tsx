@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -18,14 +18,21 @@ function UploadPage() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
+  const nameInputRef = useRef<HTMLInputElement>(null)
+
+  const focusNameInput = () => {
+    setTimeout(() => nameInputRef.current?.focus(), 0)
+  }
 
   const handleFiles = useCallback((newFiles: FileList | null) => {
     if (!newFiles) return
     const mdFiles = Array.from(newFiles).filter(
       (f) => f.name.endsWith('.md') || f.name.endsWith('.markdown'),
     )
+    if (mdFiles.length === 0) return
     setFiles((prev) => [...prev, ...mdFiles])
     setError(null)
+    focusNameInput()
   }, [])
 
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -47,6 +54,7 @@ function UploadPage() {
     const file = new File([text], fileName, { type: 'text/markdown' })
     setFiles((prev) => [...prev, file])
     setError(null)
+    focusNameInput()
   }, [])
 
   const removeFile = (index: number) => {
@@ -136,6 +144,7 @@ function UploadPage() {
           <div className="flex flex-col gap-3">
             <div className="flex gap-2">
               <Input
+                ref={nameInputRef}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
